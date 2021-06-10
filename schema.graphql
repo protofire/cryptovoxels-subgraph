@@ -29,8 +29,16 @@ type Wearable @entity {
   rarity: String!
   createdAt: BigInt!
   category: Category!
+  uri: Uri @derivedFrom(field:"wearable")
   
 }
+
+type Uri @entity {
+  id: ID!
+  wearable: Wearable
+  uri: String!
+}
+
 type Category @entity {
   id: ID!
   tokenID: BigInt!

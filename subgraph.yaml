@@ -32,6 +32,7 @@ dataSources:
       callHandlers:
         - function: mint(address,uint256,int16,int16,int16,int16,int16,int16,uint256)
           handler: handleMintParcel
+
   #----Name--------
   #----------------
   - kind: ethereum/contract
@@ -86,6 +87,8 @@ dataSources:
           handler: handleTransferSingle
         - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
           handler: handleTransferBatch
+        - event: URI(string,indexed uint256)
+          handler: handleURI
       callHandlers:
         - function: mint(address,uint256,uint256,bytes)
           handler: handleMintWearable

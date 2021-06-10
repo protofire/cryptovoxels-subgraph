@@ -1,24 +1,25 @@
 
-import { Transfer, MintCall} from '../generated/Parcel/Parcel'
+import { Transfer, MintCall } from '../generated/Parcel/Parcel'
 import { Parcel, Account } from '../generated/schema'
-import { Address, log, store } from '@graphprotocol/graph-ts'
+import { Address, store } from '@graphprotocol/graph-ts'
 
 
 function getOrCreateAccount(id: string) : Account {
   let exists = Account.load(id)
-      if(!exists) {
-          let account = new Account(id)
-          account.address = Address.fromString(id)
-          account.save()
-          return account
-      } else return Account.load(id) as Account
+
+  if(!exists) {
+      let account = new Account(id)
+      account.address = Address.fromString(id)
+      account.save()
+      return account
+  } else return Account.load(id) as Account
 }
 
 export function handleMintParcel(_: MintCall): void {
 
   let account = getOrCreateAccount(_.inputs._to.toHex())
-      account.address = _.inputs._to
-      account.save()
+  account.address = _.inputs._to
+  account.save()
 
   let parcel = new Parcel(_.inputs._tokenId.toHex())
   parcel.tokenID = _.inputs._tokenId
@@ -33,18 +34,19 @@ export function handleMintParcel(_: MintCall): void {
   
   let lengthLocation: number
   if (parcel.length % 2 == 1) {
-  lengthLocation = parcel.length + 1
+    lengthLocation = parcel.length + 1
   }
   else {
-  lengthLocation = parcel.length
+    lengthLocation = parcel.length
   }
+
   let widthLocation: number
   if (parcel.width % 2 == 1) {
     widthLocation = parcel.width + 1
-    }
-    else {
+  }
+  else {
     widthLocation = parcel.width
-    }
+  }
     
   let west:  number = ((lengthLocation/2) - _.inputs.x2)
   let east:  number = ((lengthLocation/2) + _.inputs.x1)
@@ -57,24 +59,24 @@ export function handleMintParcel(_: MintCall): void {
   let southString = south.toString().split(".")[0]
   
   if (_.inputs.x1 < 0 && _.inputs.z1 < 0) {
-  parcel.location = westString + "W," + southString + "S"
-  parcel.save()}
+    parcel.location = westString + "W," + southString + "S"
+    parcel.save()}
   else if (_.inputs.x1 < 0 && _.inputs.z1 > 0) {
-  parcel.location = westString + "W," + northString + "N"
-  parcel.save()}
+    parcel.location = westString + "W," + northString + "N"
+    parcel.save()}
   else if (_.inputs.x2 > 0 && _.inputs.z1 < 0) {
-  parcel.location = eastString + "E," + southString + "S"
-  parcel.save()}
+    parcel.location = eastString + "E," + southString + "S"
+    parcel.save()}
   else  {
-  parcel.location = eastString + "E," + northString + "N"
-  parcel.save()
-    }
+    parcel.location = eastString + "E," + northString + "N"
+    parcel.save()
+  }
 
 }
 
 export function handleTransferParcel(event: Transfer): void {
-
-if (event.params._to.toHex() == '0x0000000000000000000000000000000000000000'){
+  // Is cheking when is transfering or destroying. Minting is handle with previous function
+  if (event.params._to.toHex() == '0x0000000000000000000000000000000000000000'){
     let id = event.params._to.toHex()
     let account = getOrCreateAccount(id)
     account.address = event.params._to
@@ -83,18 +85,14 @@ if (event.params._to.toHex() == '0x0000000000000000000000000000000000000000'){
     let parcel = Parcel.load(event.params._tokenId.toHex())
     parcel.save()
     store.remove('Parcel', event.params._tokenId.toHex())
-  }
-else if (event.params._from.toHex() != '0x0000000000000000000000000000000000000000'){
-  
-  let id = event.params._to.toHex()
-  let account = getOrCreateAccount(id)
-  account.address = event.params._to
-  account.save()
+  } else if (event.params._from.toHex() != '0x0000000000000000000000000000000000000000'){
+    let id = event.params._to.toHex()
+    let account = getOrCreateAccount(id)
+    account.address = event.params._to
+    account.save()
 
-  let parcel = Parcel.load(event.params._tokenId.toHex())
-  parcel.owner = account.id
-  parcel.save()
+    let parcel = Parcel.load(event.params._tokenId.toHex())
+    parcel.owner = account.id
+    parcel.save()
   }
-
 }
-
