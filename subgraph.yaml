@@ -1,6 +1,6 @@
 specVersion: 0.0.2
-description: Cryptovoxels Subgraph
-repository: https://github.com/ZoltarSeven/cryptovoxels-subgraph
+description: Subgraph for Cryptovoxels. It is a virtual world powered by the Ethereum blockchain. Players can buy land and build stores and art galleries.
+repository: https://github.com/protofire/cryptovoxels-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
