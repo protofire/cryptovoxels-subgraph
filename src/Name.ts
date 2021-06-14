@@ -2,6 +2,8 @@ import { MintCall, Transfer } from '../generated/Name/Name'
 import { Name, Account } from '../generated/schema'
 import { Address, store, log } from '@graphprotocol/graph-ts'
 
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+
 
 function getOrCreateAccount(id: string) : Account {
   let exists = Account.load(id)
@@ -29,12 +31,12 @@ export function handleMintName(_:MintCall): void {
 }
 
 export function handleTransfer(event: Transfer): void {
-  if (event.params._to.toHex() == '0x0000000000000000000000000000000000000000'){
+  if (event.params._to.toHex() == ZERO_ADDRESS){
     let name = Name.load(event.params._tokenId.toHex())
     name.save()
     store.remove('Name', event.params._tokenId.toHex())
 
-  } else if (event.params._from.toHex() != '0x0000000000000000000000000000000000000000'){
+  } else if (event.params._from.toHex() != ZERO_ADDRESS){
     let id = event.params._to.toHex()
     let account = getOrCreateAccount(id)
     account.address = event.params._to

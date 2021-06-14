@@ -2,6 +2,7 @@ import { TransferSingle, TransferBatch, URI as UriEvent } from '../generated/Wea
 import { Wearable, Category, Account, AccountWearable, Uri } from '../generated/schema'
 import { BigInt, store, Address } from "@graphprotocol/graph-ts"
 
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 function getOrCreateAccount(id: string) : Account {
     let exists = Account.load(id)
@@ -13,9 +14,8 @@ function getOrCreateAccount(id: string) : Account {
     } else return Account.load(id) as Account
 }
 
-
 export function handleTransferSingle(event: TransferSingle): void {
-    if (event.params._from.toHexString() == '0x0000000000000000000000000000000000000000') {
+    if (event.params._from.toHexString() == ZERO_ADDRESS) {
         
         let id = event.params._to.toHex()
 
@@ -52,7 +52,7 @@ export function handleTransferSingle(event: TransferSingle): void {
         accountwearable.wearable = wearable.id
         accountwearable.quantity = wearable.initialQuantity
         accountwearable.save()
-    } else if (event.params._to.toHexString() == '0x0000000000000000000000000000000000000000'){
+    } else if (event.params._to.toHexString() == ZERO_ADDRESS){
         let id = event.params._to.toHex()
         let account = getOrCreateAccount(id)
         account.address = event.params._to
@@ -124,7 +124,7 @@ export function handleTransferBatch(event: TransferBatch): void {
     let ids = event.params._ids
     let amounts = event.params._amounts
     for (let i = 0; i < ids.length; i++) {
-        if (event.params._from.toHexString() == '0x0000000000000000000000000000000000000000') {
+        if (event.params._from.toHexString() == ZERO_ADDRESS) {
             let account = getOrCreateAccount(event.params._to.toHex())
             account.address = event.params._to
             account.save()
@@ -159,7 +159,7 @@ export function handleTransferBatch(event: TransferBatch): void {
             accountwearable.quantity = wearable.initialQuantity
             accountwearable.save()
 
-        } else if (event.params._to.toHexString() == '0x0000000000000000000000000000000000000000'){
+        } else if (event.params._to.toHexString() == ZERO_ADDRESS){
             let account = getOrCreateAccount(event.params._to.toHex())
             account.address = event.params._to
             account.save()

@@ -3,6 +3,7 @@ import { Transfer, MintCall } from '../generated/Parcel/Parcel'
 import { Parcel, Account } from '../generated/schema'
 import { Address, store } from '@graphprotocol/graph-ts'
 
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 function getOrCreateAccount(id: string) : Account {
   let exists = Account.load(id)
@@ -76,7 +77,7 @@ export function handleMintParcel(_: MintCall): void {
 
 export function handleTransferParcel(event: Transfer): void {
   // Is cheking when is transfering or destroying. Minting is handle with previous function
-  if (event.params._to.toHex() == '0x0000000000000000000000000000000000000000'){
+  if (event.params._to.toHex() == ZERO_ADDRESS){
     let id = event.params._to.toHex()
     let account = getOrCreateAccount(id)
     account.address = event.params._to
@@ -85,7 +86,7 @@ export function handleTransferParcel(event: Transfer): void {
     let parcel = Parcel.load(event.params._tokenId.toHex())
     parcel.save()
     store.remove('Parcel', event.params._tokenId.toHex())
-  } else if (event.params._from.toHex() != '0x0000000000000000000000000000000000000000'){
+  } else if (event.params._from.toHex() != ZERO_ADDRESS){
     let id = event.params._to.toHex()
     let account = getOrCreateAccount(id)
     account.address = event.params._to
